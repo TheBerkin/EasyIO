@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace EasyIO
 {    
     /// <summary>
-    /// Represents an 8-bit flag set.
+    /// Represents an 8-bit bitfield.
     /// </summary>
     public class Bitfield8
     {
@@ -36,11 +36,17 @@ namespace EasyIO
             set { bits[i] = value; }
         }
 
+        /// <summary>
+        /// Unsets all the flags in the bitfield.
+        /// </summary>
         public void UnsetAll()
         {
             Array.Clear(bits, 0, N);
         }
 
+        /// <summary>
+        /// Sets all the flags in the bitfield.
+        /// </summary>
         public void SetAll()
         {
             for(int i = 0; i < N; i++)
@@ -49,6 +55,10 @@ namespace EasyIO
             }
         }
 
+        /// <summary>
+        /// Returns the number of set flags.
+        /// </summary>
+        /// <returns>The number of set flags.</returns>
         public int GetSetCount()
         {
             int c = 0;
@@ -62,6 +72,10 @@ namespace EasyIO
             return c;
         }
 
+        /// <summary>
+        /// Returns the number of unset flags.
+        /// </summary>
+        /// <returns>The number of unset flags.</returns>
         public int GetUnsetCount()
         {
             int c = 0;
@@ -75,6 +89,9 @@ namespace EasyIO
             return c;
         }
 
+        /// <summary>
+        /// Inverts the flags in the bitfield.
+        /// </summary>
         public void Invert()
         {
             for(int i = 0; i < N; i++)
@@ -83,6 +100,11 @@ namespace EasyIO
             }
         }
 
+        /// <summary>
+        /// Retrieves a bitfield from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <returns>The read bitfield.</returns>
         public static Bitfield8 FromStream(Stream stream)
         {
             int b = stream.ReadByte();
@@ -100,6 +122,19 @@ namespace EasyIO
             return bf;
         }
 
+        /// <summary>
+        /// Writes the bitfield to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        public void WriteToStream(Stream stream)
+        {
+            stream.WriteByte(this.GetByte());
+        }
+
+        /// <summary>
+        /// Returns the bitfield as a single unsigned byte.
+        /// </summary>
+        /// <returns></returns>
         public byte GetByte()
         {
             int b = 0;
