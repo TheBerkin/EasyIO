@@ -49,6 +49,32 @@ namespace EasyIO
             }
         }
 
+        public int GetSetCount()
+        {
+            int c = 0;
+            for (int i = 0; i < N; i++)
+            {
+                if (bits[i])
+                {
+                    c++;
+                }
+            }
+            return c;
+        }
+
+        public int GetUnsetCount()
+        {
+            int c = 0;
+            for (int i = 0; i < N; i++)
+            {
+                if (!bits[i])
+                {
+                    c++;
+                }
+            }
+            return c;
+        }
+
         public void Invert()
         {
             for(int i = 0; i < N; i++)
@@ -109,6 +135,33 @@ namespace EasyIO
         public static bool operator !=(Bitfield8 a, Bitfield8 b)
         {
             return !(a == b);
+        }
+
+        public static Bitfield8 operator &(Bitfield8 a, Bitfield8 b)
+        {
+            Bitfield8 bf = new Bitfield8();
+            for(int i = 0; i < N; i++)
+            {
+                bf.bits[i] = a.bits[i] && b.bits[i];
+            }
+            return bf;
+        }
+
+        public static Bitfield8 operator |(Bitfield8 a, Bitfield8 b)
+        {
+            Bitfield8 bf = new Bitfield8();
+            for (int i = 0; i < N; i++)
+            {
+                bf.bits[i] = a.bits[i] || b.bits[i];
+            }
+            return bf;
+        }
+
+        public static Bitfield8 operator !(Bitfield8 a)
+        {
+            var bf = new Bitfield8(a.GetByte());
+            bf.Invert();
+            return bf;
         }
 
         public override bool Equals(object obj)
