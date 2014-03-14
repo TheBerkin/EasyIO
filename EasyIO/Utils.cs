@@ -58,6 +58,7 @@ namespace EasyIO
 
         public static void ConvertStructEndians<TStruct>(ref TStruct o) where TStruct : struct
         {
+            object boxed = o;
             foreach (var field in typeof(TStruct).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 Type ftype = field.FieldType;
@@ -80,23 +81,23 @@ namespace EasyIO
                             byte[] vData = new byte[length];
 
                             // Fetch the field value and store it.
-                            object value = field.GetValue(o);
+                            object value = field.GetValue(boxed);
 
                             // Transfer the field value to the pointer and copy it to the array.
                             Marshal.StructureToPtr(value, vptr, false);
                             Marshal.Copy(vptr, vData, 0, length);
-
+                            
                             // Reverse that shit.
                             Array.Reverse(vData);
 
                             // Copy it back to the pointer.
                             Marshal.Copy(vData, 0, vptr, length);
-
+                            value = Marshal.PtrToStructure(vptr, ftype);
                             // Plug it back into the field.
-                            field.SetValue(o, Marshal.PtrToStructure(vptr, ftype));
-
+                            field.SetValue(boxed, value);
                             // Deallocate the pointer.
                             Marshal.FreeHGlobal(vptr);
+                            o = (TStruct)boxed;
                         }
                         break; // Go to the next field.
                     }
