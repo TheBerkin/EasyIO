@@ -54,7 +54,7 @@ namespace EasyIO
         /// <param name="mode">Speficies how the operating system should open the file.</param>
         /// <param name="startIndex">The index at which to start reading.</param>
         /// <param name="defaultEndianness">The endianness of the data to be read.</param>
-        public EasyReader(string path, FileMode mode, int startIndex = 0, Endian defaultEndianness = Endian.Little)
+        public EasyReader(string path, FileMode mode = FileMode.Open, int startIndex = 0, Endian defaultEndianness = Endian.Little)
         {
             _stream = File.Open(path, mode);
             _stream.Position = startIndex;

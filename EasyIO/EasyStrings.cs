@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace EasyIO
 {
-    public static class EIOStrings
+    /// <summary>
+    /// Provides functions for updating string entries.
+    /// </summary>
+    public static class EasyStrings
     {
         /// <summary>
         /// Pushes a string to the start of a list file and shifts the list contents to the right, deleting the last entry.
@@ -15,7 +18,7 @@ namespace EasyIO
         /// <param name="path">The path to the file</param>
         /// <param name="str">The string to push.</param>
         /// <returns>True if successful; otherwise, false.</returns>
-        public static bool PushStartFixedASCII(string path, string str)
+        public static bool PushStartFixed(string path, string str)
         {
             string[] strs = ReadStringsFromBinary(path);
             int n = strs.Length;
@@ -48,7 +51,7 @@ namespace EasyIO
         /// <param name="path">The path to the file.</param>
         /// <param name="str">The string to push.</param>
         /// <returns>True if successful; otherwise, false.</returns>
-        public static bool PushEndFixedASCII(string path, string str)
+        public static bool PushEndFixed(string path, string str)
         {
             string[] strs = ReadStringsFromBinary(path);
             int n = strs.Length;
@@ -74,40 +77,20 @@ namespace EasyIO
             WriteStringsToBinary(path, sout);
             return true;
         }
-
-        /// <summary>
-        /// Reads an array of strings from a binary file.
-        /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>The string array read from the file.</returns>
-        public static string[] ReadStringsFromBinary(string path)
+        
+        private static string[] ReadStringsFromBinary(string path)
         {
-            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+            using (EasyReader reader = new EasyReader(path))
             {
-                int count = reader.ReadInt32();
-                string[] strs = new string[count];
-                for(int i = 0; i < count; i++)
-                {
-                    strs[i] = reader.ReadEIOString();
-                }
-                return strs;
+                return reader.ReadStringArray();
             }
         }
 
-        /// <summary>
-        /// Writes an array of strings to a file.
-        /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <param name="strs">The array of strings to write to the file.</param>
-        public static void WriteStringsToBinary(string path, string[] strs)
+        private static void WriteStringsToBinary(string path, string[] strs)
         {
-            using (BinaryWriter writer = new BinaryWriter(File.Create(path)))
+            using (EasyWriter writer = new EasyWriter(path))
             {
-                writer.Write(strs.Length);
-                for(int i = 0; i < strs.Length; i++)
-                {
-                    writer.WriteEIOString(strs[i]);
-                }
+                writer.Write(strs);
             }
         }
     }

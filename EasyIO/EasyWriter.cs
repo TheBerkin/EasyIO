@@ -46,6 +46,7 @@ namespace EasyIO
         /// Creates a new instance of the EasyIO.EasyWriter class from the specified file path and mode.
         /// </summary>
         /// <param name="path">The path to the file to write.</param>
+        /// <param name="endianness">The endianness in which to write data.</param>
         /// <param name="mode">Specifies how the operating system should open the file.</param>
         public EasyWriter(string path, FileMode mode = FileMode.Create, Endian endianness = Endian.Little)
         {

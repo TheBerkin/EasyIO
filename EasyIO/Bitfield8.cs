@@ -10,18 +10,9 @@ namespace EasyIO
     /// <summary>
     /// Represents an 8-bit bitfield.
     /// </summary>
-    public class BitField8
+    public struct BitField8
     {
-        private bool[] bits;
-        private const int N = 8;
-        
-        /// <summary>
-        /// Creates a new instance of the EasyIO.BitField8 class.
-        /// </summary>
-        public BitField8()
-        {
-            bits = new bool[N];
-        }
+        private byte field;
 
         /// <summary>
         /// Creates a new instance of the EasyIO.BitField8 class from the specified data.
@@ -29,12 +20,7 @@ namespace EasyIO
         /// <param name="data">The data to create the bit field form.</param>
         public BitField8(byte data)
         {
-            bits = new bool[N];
-
-            for(int i = 0; i < N; i++)
-            {
-                bits[i] = data.GetFlag(i);
-            }
+            field = data;
         }
 
         /// <summary>
@@ -44,8 +30,8 @@ namespace EasyIO
         /// <returns></returns>
         public bool this[int i]
         {
-            get { return bits[i]; }
-            set { bits[i] = value; }
+            get { return (field & (1 << i)) == 1; }
+            set { field = (byte)((field & (0xFE << i)) | ((value ? 1 : 0) << i)); }
         }
 
         /// <summary>
@@ -53,7 +39,7 @@ namespace EasyIO
         /// </summary>
         public void UnsetAll()
         {
-            Array.Clear(bits, 0, N);
+            field = 0;
         }
 
         /// <summary>
@@ -61,10 +47,7 @@ namespace EasyIO
         /// </summary>
         public void SetAll()
         {
-            for(int i = 0; i < N; i++)
-            {
-                bits[i] = true;
-            }
+            field = 0xFF;
         }
 
         /// <summary>
@@ -73,15 +56,7 @@ namespace EasyIO
         /// <returns>The number of set flags.</returns>
         public int GetSetCount()
         {
-            int c = 0;
-            for (int i = 0; i < N; i++)
-            {
-                if (bits[i])
-                {
-                    c++;
-                }
-            }
-            return c;
+            return Utils.NumberOfSetBits(field);
         }
 
         /// <summary>
@@ -90,15 +65,7 @@ namespace EasyIO
         /// <returns>The number of unset flags.</returns>
         public int GetUnsetCount()
         {
-            int c = 0;
-            for (int i = 0; i < N; i++)
-            {
-                if (!bits[i])
-                {
-                    c++;
-                }
-            }
-            return c;
+            return 8 - Utils.NumberOfSetBits(field);
         }
 
         /// <summary>
@@ -106,10 +73,7 @@ namespace EasyIO
         /// </summary>
         public void Invert()
         {
-            for(int i = 0; i < N; i++)
-            {
-                bits[i] = !bits[i];
-            }
+            field = (byte)~field;
         }
 
         /// <summary>
@@ -124,14 +88,8 @@ namespace EasyIO
             {
                 throw new EndOfStreamException();
             }
-
-            var bf = new BitField8();
-            for(int i = 0; i < N; i++)
-            {
-                bf.bits[i] = b.GetFlag(i);
-            }
-
-            return bf;
+            
+            return new BitField8((byte)b);
         }
 
         /// <summary>
@@ -149,12 +107,7 @@ namespace EasyIO
         /// <returns></returns>
         public byte GetByte()
         {
-            int b = 0;
-            for(int i = 0; i < N; i++)
-            {
-                b |= (0x1 << i);
-            }
-            return (byte)b;
+            return field;
         }
 
         /// <summary>
@@ -178,35 +131,6 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Tests equality between two bit fields.
-        /// </summary>
-        /// <param name="a">The first bit field.</param>
-        /// <param name="b">The second bit field.</param>
-        /// <returns></returns>
-        public static bool operator ==(BitField8 a, BitField8 b)
-        {
-            for(int i = 0; i < N; i++)
-            {
-                if (!a.bits[i] && b.bits[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests inequality between two bit fields.
-        /// </summary>
-        /// <param name="a">The first bit field.</param>
-        /// <param name="b">The second bit field.</param>
-        /// <returns></returns>
-        public static bool operator !=(BitField8 a, BitField8 b)
-        {
-            return !(a == b);
-        }
-
-        /// <summary>
         /// Performs an AND operation on two bit fields.
         /// </summary>
         /// <param name="a">The first bit field.</param>
@@ -215,10 +139,7 @@ namespace EasyIO
         public static BitField8 operator &(BitField8 a, BitField8 b)
         {
             BitField8 bf = new BitField8();
-            for(int i = 0; i < N; i++)
-            {
-                bf.bits[i] = a.bits[i] && b.bits[i];
-            }
+            bf.field = (byte)(a.field & b.field);
             return bf;
         }
 
@@ -231,10 +152,7 @@ namespace EasyIO
         public static BitField8 operator |(BitField8 a, BitField8 b)
         {
             BitField8 bf = new BitField8();
-            for (int i = 0; i < N; i++)
-            {
-                bf.bits[i] = a.bits[i] || b.bits[i];
-            }
+            bf.field = (byte)(a.field | b.field);
             return bf;
         }
 
@@ -245,30 +163,16 @@ namespace EasyIO
         /// <returns></returns>
         public static BitField8 operator ~(BitField8 a)
         {
-            var bf = new BitField8(a.GetByte());
-            bf.Invert();
-            return bf;
-        }
-        
-        public override bool Equals(object obj)
-        {
-            var bf = obj as BitField8;
-
-            if ((object)bf == null)
-            {
-                return false;
-            }
-
-            return this == bf;
+            return new BitField8((byte)~a.field);
         }
 
         /// <summary>
-        /// Retrieves a hash code that nobody actually uses.
+        /// Gets the string representation for this instance.
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode()
+        public override string ToString()
         {
-            return base.GetHashCode() ^ GetByte();
+            return String.Format("BitField8: {0:X8}", field);
         }
     }
 }

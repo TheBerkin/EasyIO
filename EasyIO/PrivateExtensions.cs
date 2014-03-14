@@ -9,28 +9,6 @@ namespace EasyIO
 {
     internal static class PrivateExtensions
     {
-        public static string ReadEIOString(this BinaryReader reader)
-        {
-            int lengthBytes = reader.ReadInt32();
-            return EIOSettings.TextEncoding.GetString(reader.ReadBytes(lengthBytes));
-        }
-
-        public static void WriteEIOString(this BinaryWriter writer, string data)
-        {
-            writer.Write(data.GetEIOByteCount());
-            writer.Write(data.GetEIOBytes());
-        }
-
-        public static int GetEIOByteCount(this string str)
-        {
-            return EIOSettings.TextEncoding.GetByteCount(str);
-        }
-
-        public static byte[] GetEIOBytes(this string str)
-        {
-            return EIOSettings.TextEncoding.GetBytes(str);
-        }
-
         public static bool GetFlag(this byte field, int pos)
         {
             return ((field >> pos) & 0x1) == 1;
