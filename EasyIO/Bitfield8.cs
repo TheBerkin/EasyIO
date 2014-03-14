@@ -10,7 +10,7 @@ namespace EasyIO
     /// <summary>
     /// Represents an 8-bit bitfield.
     /// </summary>
-    public struct BitField8
+    public struct BitField8 : IBitField
     {
         private byte field;
 
@@ -31,7 +31,7 @@ namespace EasyIO
         public bool this[int i]
         {
             get { return (field & (1 << i)) == 1; }
-            set { field = (byte)((field & (0xFE << i)) | ((value ? 1 : 0) << i)); }
+            set { field = (byte)((field & ~(1 << i)) | ((value ? 1 : 0) << i)); }
         }
 
         /// <summary>
@@ -77,37 +77,12 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Retrieves a bitfield from the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to read from.</param>
-        /// <returns>The read bitfield.</returns>
-        public static BitField8 FromStream(Stream stream)
-        {
-            int b = stream.ReadByte();
-            if (b < 0)
-            {
-                throw new EndOfStreamException();
-            }
-            
-            return new BitField8((byte)b);
-        }
-
-        /// <summary>
-        /// Writes the bitfield to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        public void WriteToStream(Stream stream)
-        {
-            stream.WriteByte(this.GetByte());
-        }
-
-        /// <summary>
         /// Returns the bitfield as a single unsigned byte.
         /// </summary>
         /// <returns></returns>
-        public byte GetByte()
+        public byte[] GetBytes()
         {
-            return field;
+            return new[] { field };
         }
 
         /// <summary>
@@ -117,7 +92,7 @@ namespace EasyIO
         /// <returns></returns>
         public static implicit operator byte(BitField8 bitfield)
         {
-            return bitfield.GetByte();
+            return bitfield.field;
         }
 
         /// <summary>

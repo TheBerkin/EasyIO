@@ -290,15 +290,6 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Reads an 8-bit bit field.
-        /// </summary>
-        /// <returns></returns>
-        public BitField8 ReadBitfield8()
-        {
-            return BitField8.FromStream(_stream);
-        }
-
-        /// <summary>
         /// Reads a string encoded in the specified encoding.
         /// </summary>
         /// <param name="encoding">The encoding of the string to be read.</param>
