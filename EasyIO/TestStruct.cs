@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace EasyIO
 {
-    public enum Endianness
+    struct TestStruct
     {
-        Big,
-        Little
+        [Endianness(Endian.Big)]
+        public int NumberA;
+
+        [Endianness(Endian.Little)]
+        public int NumberB;
     }
 }

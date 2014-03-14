@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace EasyIO
@@ -14,7 +15,8 @@ namespace EasyIO
     public class EasyReader : IDisposable
     {
         private Stream _stream;
-        private Endianness _defEndian;
+        private Endian _endian;
+        private bool _leaveOpen;
 
         /// <summary>
         /// Creates a new instance of the EasyIO.EasyReader class from the specified stream.
@@ -22,11 +24,27 @@ namespace EasyIO
         /// <param name="stream">The stream from which to read.</param>
         /// <param name="startIndex">The index at which to start reading.</param>
         /// <param name="defaultEndianness">The endianness of the data to be read.</param>
-        public EasyReader(Stream stream, int startIndex = 0, Endianness defaultEndianness = Endianness.Little)
+        public EasyReader(Stream stream, int startIndex = 0, Endian defaultEndianness = Endian.Little)
         {
             _stream = stream;
             _stream.Position = startIndex;
-            _defEndian = defaultEndianness;
+            _endian = defaultEndianness;
+            _leaveOpen = false;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the EasyIO.EasyReader class from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream from which to read.</param>
+        /// <param name="leaveOpen">Specifies whether or not to leave the stream open after the reader is disposed.</param>
+        /// <param name="startIndex">The index at which to start reading.</param>
+        /// <param name="defaultEndianness">The endianness of the data to be read.</param>
+        public EasyReader(Stream stream, bool leaveOpen, int startIndex = 0, Endian defaultEndianness = Endian.Little)
+        {
+            _stream = stream;
+            _stream.Position = startIndex;
+            _endian = defaultEndianness;
+            _leaveOpen = leaveOpen;
         }
 
         /// <summary>
@@ -36,11 +54,12 @@ namespace EasyIO
         /// <param name="mode">Speficies how the operating system should open the file.</param>
         /// <param name="startIndex">The index at which to start reading.</param>
         /// <param name="defaultEndianness">The endianness of the data to be read.</param>
-        public EasyReader(string path, FileMode mode, int startIndex = 0, Endianness defaultEndianness = Endianness.Little)
+        public EasyReader(string path, FileMode mode, int startIndex = 0, Endian defaultEndianness = Endian.Little)
         {
             _stream = File.Open(path, mode);
             _stream.Position = startIndex;
-            _defEndian = defaultEndianness;
+            _endian = defaultEndianness;
+            _leaveOpen = false;
         }
 
         /// <summary>
@@ -49,19 +68,20 @@ namespace EasyIO
         /// <param name="data">The byte array to read from.</param>
         /// <param name="startIndex">The index at which to start reading.</param>
         /// <param name="defaultEndianness">The endianness of the data to be read.</param>
-        public EasyReader(byte[] data, int startIndex = 0, Endianness defaultEndianness = Endianness.Little)
+        public EasyReader(byte[] data, int startIndex = 0, Endian defaultEndianness = Endian.Little)
         {
             _stream = new MemoryStream(data);
             _stream.Position = startIndex;
-            _defEndian = defaultEndianness;
+            _endian = defaultEndianness;
         }
 
         /// <summary>
-        /// The endianness in which data is read by the stream.
+        /// Gets or sets the endianness in which data is read by the stream.
         /// </summary>
-        public Endianness Endianness
+        public Endian Endianness
         {
-            get { return _defEndian; }
+            get { return _endian; }
+            set { _endian = value; }
         }
 
         /// <summary>
@@ -96,49 +116,7 @@ namespace EasyIO
             get { return _stream; }
         }
 
-        private static void ConvertToSystemEndian(byte[] data, Endianness dataEndianness)
-        {
-            if (BitConverter.IsLittleEndian)
-            {
-                if (dataEndianness == EasyIO.Endianness.Big)
-                {                    
-                    Array.Reverse(data);
-                }
-            }
-            else if (dataEndianness == EasyIO.Endianness.Little)
-            {
-                Array.Reverse(data);
-            }
-        }
-
-        private static bool IsNumericType(Type t)
-        {
-            switch (Type.GetTypeCode(t))
-            {
-                case TypeCode.Byte:
-                case TypeCode.SByte:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Single:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        private byte[] ReadAndFormat(int count)
-        {
-            byte[] buffer = new byte[count];
-            _stream.Read(buffer, 0, count);
-            ConvertToSystemEndian(buffer, _defEndian);
-            return buffer;
-        }
+        
 
         /// <summary>
         /// Returns the next available byte but does not consume it.
@@ -332,6 +310,37 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads an array of Unicode strings.
+        /// </summary>
+        /// <returns></returns>
+        public string[] ReadStringArray()
+        {
+            int length = ReadInt32();
+            string[] array = new string[length];
+            for(int i = 0; i < length; i++)
+            {
+                array[i] = ReadString();
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Reads a string array encoded in the specified encoding.
+        /// </summary>
+        /// <param name="encoding">The encoding of the strings to be read.</param>
+        /// <returns></returns>
+        public string[] ReadStringArray(Encoding encoding)
+        {
+            int length = ReadInt32();
+            string[] array = new string[length];
+            for(int i = 0; i < length; i++)
+            {
+                array[i] = ReadString(encoding);
+            }
+            return array;
+        }
+
+        /// <summary>
         /// Reads an array of the specified type.
         /// </summary>
         /// <typeparam name="T">The type stored in the array.</typeparam>
@@ -339,7 +348,7 @@ namespace EasyIO
         /// <returns></returns>
         public T[] ReadArray<T>(bool use64bit = false) where T : struct
         {
-            bool isNumeric = IsNumericType(typeof(T));
+            bool isNumeric = Utils.IsNumericType(typeof(T));
             long count = use64bit ? ReadInt64() : ReadInt32();            
             T[] array = new T[count];
             for(int i = 0; i < count; i++)
@@ -352,24 +361,23 @@ namespace EasyIO
         /// <summary>
         /// Reads a dictionary of the specified key and value types.
         /// </summary>
-        /// <typeparam name="K">The key type of the dictionary.</typeparam>
-        /// <typeparam name="V">The value type of the dictionary.</typeparam>
-        /// <param name="use64bit">Indicates to the reader that the dictionary length is 64-bit rather than 32-bit.</param>
+        /// <typeparam name="TKey">The key type of the dictionary.</typeparam>
+        /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
         /// <returns></returns>
-        public Dictionary<K, V> ReadDictionary<K, V>() 
-            where K : struct
-            where V : struct
+        public Dictionary<TKey, TValue> ReadDictionary<TKey, TValue>() 
+            where TKey : struct
+            where TValue : struct
         {
-            bool isKNumeric = IsNumericType(typeof(K));
-            bool isVNumeric = IsNumericType(typeof(V));
+            bool isKNumeric = Utils.IsNumericType(typeof(TKey));
+            bool isVNumeric = Utils.IsNumericType(typeof(TValue));
             int count = ReadInt32();
-            var dict = new Dictionary<K, V>(count);
-            K key;
-            V value;
+            var dict = new Dictionary<TKey, TValue>(count);
+            TKey key;
+            TValue value;
             for(int i = 0; i < count; i++)
             {
-                key = ReadStruct<K>(isKNumeric);
-                value = ReadStruct<V>(isVNumeric);
+                key = ReadStruct<TKey>(isKNumeric);
+                value = ReadStruct<TValue>(isVNumeric);
                 dict.Add(key, value);
             }
             return dict;
@@ -378,33 +386,49 @@ namespace EasyIO
         /// <summary>
         /// Reads an enumeration member.
         /// </summary>
-        /// <typeparam name="T">The enumeration type to read.</typeparam>
+        /// <typeparam name="TEnum">The enumeration type to read.</typeparam>
         /// <returns></returns>
-        public T ReadEnum<T>() where T : struct, IConvertible
+        public TEnum ReadEnum<TEnum>() where TEnum : struct, IConvertible
         {
-            if (!typeof(T).IsEnum)
+            if (!typeof(TEnum).IsEnum)
             {
                 throw new ArgumentException("T must be an enumerated type.");
             }
-            byte size = (byte)Marshal.SizeOf(Enum.GetUnderlyingType(typeof(T)));
+            byte size = (byte)Marshal.SizeOf(Enum.GetUnderlyingType(typeof(TEnum)));
             byte[] data = ReadAndFormat(size);
-            return (T)Enum.ToObject(typeof(T), BitConverter.ToInt64(data, 0));
+            return (TEnum)Enum.ToObject(typeof(TEnum), BitConverter.ToInt64(data, 0));
         }
 
         /// <summary>
         /// Reads a struct of the specified type.
         /// </summary>
-        /// <typeparam name="T">The struct to read.</typeparam>
+        /// <typeparam name="TStruct">The struct to read.</typeparam>
         /// <returns></returns>
-        public T ReadStruct<T>(bool convertEndian = false) where T : struct
+        public TStruct ReadStruct<TStruct>(bool convertEndian = true) where TStruct : struct
         {
-            int size = Marshal.SizeOf(typeof(T));
+            int size = Marshal.SizeOf(typeof(TStruct));
             byte[] data = convertEndian ? ReadAndFormat(size) : ReadBytes(size);
             IntPtr ptr = Marshal.AllocHGlobal(size);
             Marshal.Copy(data, 0, ptr, size);
-            T i = (T)Marshal.PtrToStructure(ptr, typeof(T));
+            TStruct i = (TStruct)Marshal.PtrToStructure(ptr, typeof(TStruct));
+
+            if (convertEndian)
+            {
+                Utils.ConvertStructEndians<TStruct>(ref i);
+            }
+
             Marshal.FreeHGlobal(ptr);
             return i;
+        }
+
+        
+
+        private byte[] ReadAndFormat(int count)
+        {
+            byte[] buffer = new byte[count];
+            _stream.Read(buffer, 0, count);
+            Utils.ConvertEndian(buffer, _endian);
+            return buffer;
         }
 
         /// <summary>
@@ -420,7 +444,10 @@ namespace EasyIO
         /// </summary>
         void IDisposable.Dispose()
         {
-            _stream.Dispose();
+            if (!_leaveOpen)
+            {
+                _stream.Dispose();
+            }
         }
     }
 }

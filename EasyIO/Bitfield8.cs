@@ -15,11 +15,18 @@ namespace EasyIO
         private bool[] bits;
         private const int N = 8;
         
+        /// <summary>
+        /// Creates a new instance of the EasyIO.BitField8 class.
+        /// </summary>
         public BitField8()
         {
             bits = new bool[N];
         }
 
+        /// <summary>
+        /// Creates a new instance of the EasyIO.BitField8 class from the specified data.
+        /// </summary>
+        /// <param name="data">The data to create the bit field form.</param>
         public BitField8(byte data)
         {
             bits = new bool[N];
@@ -30,6 +37,11 @@ namespace EasyIO
             }
         }
 
+        /// <summary>
+        /// Accesses the bit at the specified index in the bit field.
+        /// </summary>
+        /// <param name="i">The index of the bit to access.</param>
+        /// <returns></returns>
         public bool this[int i]
         {
             get { return bits[i]; }
@@ -145,16 +157,32 @@ namespace EasyIO
             return (byte)b;
         }
 
+        /// <summary>
+        /// Converts a BitField8 to a byte.
+        /// </summary>
+        /// <param name="bitfield">The bit field to convert.</param>
+        /// <returns></returns>
         public static implicit operator byte(BitField8 bitfield)
         {
             return bitfield.GetByte();
         }
 
+        /// <summary>
+        /// Converts a byte to a BitField8.
+        /// </summary>
+        /// <param name="data">The byte to convert.</param>
+        /// <returns></returns>
         public static implicit operator BitField8(byte data)
         {
             return new BitField8(data);
         }
 
+        /// <summary>
+        /// Tests equality between two bit fields.
+        /// </summary>
+        /// <param name="a">The first bit field.</param>
+        /// <param name="b">The second bit field.</param>
+        /// <returns></returns>
         public static bool operator ==(BitField8 a, BitField8 b)
         {
             for(int i = 0; i < N; i++)
@@ -167,11 +195,23 @@ namespace EasyIO
             return true;
         }
 
+        /// <summary>
+        /// Tests inequality between two bit fields.
+        /// </summary>
+        /// <param name="a">The first bit field.</param>
+        /// <param name="b">The second bit field.</param>
+        /// <returns></returns>
         public static bool operator !=(BitField8 a, BitField8 b)
         {
             return !(a == b);
         }
 
+        /// <summary>
+        /// Performs an AND operation on two bit fields.
+        /// </summary>
+        /// <param name="a">The first bit field.</param>
+        /// <param name="b">The second bit field.</param>
+        /// <returns></returns>
         public static BitField8 operator &(BitField8 a, BitField8 b)
         {
             BitField8 bf = new BitField8();
@@ -182,6 +222,12 @@ namespace EasyIO
             return bf;
         }
 
+        /// <summary>
+        /// Performs an OR operation on two bit fields.
+        /// </summary>
+        /// <param name="a">The first bit field.</param>
+        /// <param name="b">The second bit field.</param>
+        /// <returns></returns>
         public static BitField8 operator |(BitField8 a, BitField8 b)
         {
             BitField8 bf = new BitField8();
@@ -192,13 +238,18 @@ namespace EasyIO
             return bf;
         }
 
-        public static BitField8 operator !(BitField8 a)
+        /// <summary>
+        /// Performs an NOT operation on two bit fields.
+        /// </summary>
+        /// <param name="a">The first bit field.</param>
+        /// <returns></returns>
+        public static BitField8 operator ~(BitField8 a)
         {
             var bf = new BitField8(a.GetByte());
             bf.Invert();
             return bf;
         }
-
+        
         public override bool Equals(object obj)
         {
             var bf = obj as BitField8;
@@ -211,6 +262,10 @@ namespace EasyIO
             return this == bf;
         }
 
+        /// <summary>
+        /// Retrieves a hash code that nobody actually uses.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return base.GetHashCode() ^ GetByte();
