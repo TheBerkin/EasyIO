@@ -9,14 +9,14 @@ namespace EasyIO
 {
     public static class Extensions
     {
-        public static void Write(this BinaryWriter writer, Bitfield8 bf)
+        public static void Write(this BinaryWriter writer, BitField8 bf)
         {
             writer.Write(bf.GetByte());
         }
 
-        public static Bitfield8 ReadBitfield8(this BinaryReader reader)
+        public static BitField8 ReadBitfield8(this BinaryReader reader)
         {
-            return new Bitfield8(reader.ReadByte());
+            return new BitField8(reader.ReadByte());
         }
     }
 }

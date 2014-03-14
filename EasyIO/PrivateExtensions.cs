@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EasyIO
 {
-    static class PrivateExtensions
+    internal static class PrivateExtensions
     {
         public static string ReadEIOString(this BinaryReader reader)
         {

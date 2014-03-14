@@ -10,17 +10,17 @@ namespace EasyIO
     /// <summary>
     /// Represents an 8-bit bitfield.
     /// </summary>
-    public class Bitfield8
+    public class BitField8
     {
         private bool[] bits;
         private const int N = 8;
         
-        public Bitfield8()
+        public BitField8()
         {
             bits = new bool[N];
         }
 
-        public Bitfield8(byte data)
+        public BitField8(byte data)
         {
             bits = new bool[N];
 
@@ -105,7 +105,7 @@ namespace EasyIO
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
         /// <returns>The read bitfield.</returns>
-        public static Bitfield8 FromStream(Stream stream)
+        public static BitField8 FromStream(Stream stream)
         {
             int b = stream.ReadByte();
             if (b < 0)
@@ -113,7 +113,7 @@ namespace EasyIO
                 throw new EndOfStreamException();
             }
 
-            var bf = new Bitfield8();
+            var bf = new BitField8();
             for(int i = 0; i < N; i++)
             {
                 bf.bits[i] = b.GetFlag(i);
@@ -145,17 +145,17 @@ namespace EasyIO
             return (byte)b;
         }
 
-        public static implicit operator byte(Bitfield8 bitfield)
+        public static implicit operator byte(BitField8 bitfield)
         {
             return bitfield.GetByte();
         }
 
-        public static implicit operator Bitfield8(byte data)
+        public static implicit operator BitField8(byte data)
         {
-            return new Bitfield8(data);
+            return new BitField8(data);
         }
 
-        public static bool operator ==(Bitfield8 a, Bitfield8 b)
+        public static bool operator ==(BitField8 a, BitField8 b)
         {
             for(int i = 0; i < N; i++)
             {
@@ -167,14 +167,14 @@ namespace EasyIO
             return true;
         }
 
-        public static bool operator !=(Bitfield8 a, Bitfield8 b)
+        public static bool operator !=(BitField8 a, BitField8 b)
         {
             return !(a == b);
         }
 
-        public static Bitfield8 operator &(Bitfield8 a, Bitfield8 b)
+        public static BitField8 operator &(BitField8 a, BitField8 b)
         {
-            Bitfield8 bf = new Bitfield8();
+            BitField8 bf = new BitField8();
             for(int i = 0; i < N; i++)
             {
                 bf.bits[i] = a.bits[i] && b.bits[i];
@@ -182,9 +182,9 @@ namespace EasyIO
             return bf;
         }
 
-        public static Bitfield8 operator |(Bitfield8 a, Bitfield8 b)
+        public static BitField8 operator |(BitField8 a, BitField8 b)
         {
-            Bitfield8 bf = new Bitfield8();
+            BitField8 bf = new BitField8();
             for (int i = 0; i < N; i++)
             {
                 bf.bits[i] = a.bits[i] || b.bits[i];
@@ -192,16 +192,16 @@ namespace EasyIO
             return bf;
         }
 
-        public static Bitfield8 operator !(Bitfield8 a)
+        public static BitField8 operator !(BitField8 a)
         {
-            var bf = new Bitfield8(a.GetByte());
+            var bf = new BitField8(a.GetByte());
             bf.Invert();
             return bf;
         }
 
         public override bool Equals(object obj)
         {
-            var bf = obj as Bitfield8;
+            var bf = obj as BitField8;
 
             if ((object)bf == null)
             {

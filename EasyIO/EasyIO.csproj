@@ -20,9 +20,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\EasyIO.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -40,9 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bitfield8.cs" />
+    <Compile Include="BitField8.cs" />
+    <Compile Include="EasyReader.cs" />
     <Compile Include="EIOSettings.cs" />
     <Compile Include="EIOStrings.cs" />
+    <Compile Include="Endianness.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="PrivateExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
