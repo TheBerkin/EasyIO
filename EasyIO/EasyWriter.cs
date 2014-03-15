@@ -288,53 +288,45 @@ namespace EasyIO
         /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
         /// <param name="value">The dictionary to write.</param>
         public void Write<TKey, TValue>(Dictionary<TKey, TValue> value)
-            where TKey : struct
-            where TValue : struct
         {
-            bool isKNumeric = Utils.IsNumericType(typeof(TKey));
-            bool isVNumeric = Utils.IsNumericType(typeof(TValue));
+            var ktype = typeof(TKey);
+            bool kIsString = ktype == typeof(String);
+            var vtype = typeof(TValue);
+            bool vIsString = vtype == typeof(String);
+
+            if (!ktype.IsValueType && !kIsString)
+            {
+                throw new ArgumentException("TKey must be either a value type or System.String.");
+            }
+            else if (!vtype.IsValueType && !vIsString)
+            {
+                throw new ArgumentException("TVaue must be either a value type or System.String.");
+            }
+
             Write(value.Count);
 
+            bool isKNumeric = Utils.IsNumericType(typeof(TKey));
+            bool isVNumeric = Utils.IsNumericType(typeof(TValue));
+            
             foreach(KeyValuePair<TKey, TValue> pair in value)
             {
-                Write<TKey>(pair.Key, isKNumeric);
-                Write<TValue>(pair.Value, isVNumeric);
-            }
-        }
-
-        /// <summary>
-        /// Writes a dictionary of string keys and the specified value type to the stream.
-        /// </summary>
-        /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
-        /// <param name="value">The dictionary to write.</param>
-        public void Write<TValue>(Dictionary<string, TValue> value)
-            where TValue : struct
-        {
-            bool isVNumeric = Utils.IsNumericType(typeof(TValue));
-            Write(value.Count);
-
-            foreach(var pair in value)
-            {
-                Write(pair.Key);
-                Write<TValue>(pair.Value, isVNumeric);
-            }
-        }
-
-        /// <summary>
-        /// Writes a dictionary of strings with the specified key value type to the stream.
-        /// </summary>
-        /// <typeparam name="TKey">The key type of the dictionary.</typeparam>
-        /// <param name="value">The dictionary to write.</param>
-        public void Write<TKey>(Dictionary<TKey, string> value)
-            where TKey : struct
-        {
-            bool isKNumeric = Utils.IsNumericType(typeof(TKey));
-            Write(value.Count);
-
-            foreach(var pair in value)
-            {
-                Write<TKey>(pair.Key, isKNumeric);
-                Write(pair.Value);
+                if (kIsString)
+                {
+                    Write(pair.Key.ToString());
+                }
+                else
+                {                    
+                    Write<TKey>(pair.Key, isKNumeric);
+                }
+                
+                if (vIsString)
+                {
+                    Write(pair.Value.ToString());
+                }
+                else
+                {
+                    Write<TValue>(pair.Value, isVNumeric);
+                }                
             }
         }
 
@@ -344,8 +336,13 @@ namespace EasyIO
         /// <typeparam name="TStruct">The type of the struct or enum.</typeparam>
         /// <param name="value">The object to write.</param>
         /// <param name="convertEndian">Indicates to the writer if endianness attributes should be regarded.</param>
-        public void Write<TStruct>(TStruct value, bool convertEndian = true) where TStruct : struct
+        public void Write<TStruct>(TStruct value, bool convertEndian = true)
         {
+            if (!typeof(TStruct).IsValueType)
+            {
+                throw new ArgumentException("TStruct must be a value type.");
+            }
+
             var type = typeof(TStruct);
             int size = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(value);
             byte[] data = new byte[size];

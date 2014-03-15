@@ -12,51 +12,29 @@ namespace StructTest
     {
         static void Main(string[] args)
         {
-            TestStruct test = new TestStruct()
-            {
-                A = 1,
-                B = 2,
-                C = 3
-            };
+            var dictIn = new Dictionary<int, string>();
+            dictIn.Add(1, "One");
+            dictIn.Add(2, "Two");
+            dictIn.Add(3, "Three");
+            dictIn.Add(4, "Four");
 
             Console.WriteLine("Writing data...");
             using (EasyWriter writer = new EasyWriter("example.dat"))
             {
-                writer.Write(TestEnum.Foo);
-                writer.Write(TestEnum.Bar);
-                writer.Write(test);
+                writer.Write(dictIn);
             }
 
             Console.WriteLine("Reading data...");
             using (EasyReader reader = new EasyReader("example.dat"))
             {
-                Console.WriteLine("TestEnum.{0}", reader.ReadEnum<TestEnum>());
-                Console.WriteLine("TestEnum.{0}", reader.ReadEnum<TestEnum>());
-                Console.WriteLine(reader.ReadStruct<TestStruct>());
+                var dictOut = reader.ReadDictionary<int, string>();
+                foreach(var pair in dictOut)
+                {
+                    Console.WriteLine(pair);
+                }
             }
 
             Console.ReadKey();
-        }
-
-        struct TestStruct
-        {
-            public int A;
-
-            [Endianness(Endian.Big)]
-            public long B;
-
-            public float C;
-
-            public override string ToString()
-            {
-                return String.Format("TestStruct: A={0}; B={1}; C={2};", A, B, C);
-            }
-        }
-
-        enum TestEnum : int
-        {
-            Foo = 1,
-            Bar = 2
         }
     }
 }

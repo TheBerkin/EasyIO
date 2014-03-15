@@ -356,9 +356,23 @@ namespace EasyIO
         /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
         /// <returns></returns>
         public Dictionary<TKey, TValue> ReadDictionary<TKey, TValue>() 
-            where TKey : struct
-            where TValue : struct
+            where TKey : IConvertible
+            where TValue : IConvertible
         {
+            var ktype = typeof(TKey);
+            bool kIsString = ktype == typeof(String);
+            var vtype = typeof(TValue);
+            bool vIsString = vtype == typeof(String);
+
+            if (!ktype.IsValueType && !kIsString)
+            {
+                throw new ArgumentException("TKey must be either a value type or System.String.");
+            }
+            else if (!vtype.IsValueType && !vIsString)
+            {
+                throw new ArgumentException("TVaue must be either a value type or System.String.");
+            }
+
             bool isKNumeric = Utils.IsNumericType(typeof(TKey));
             bool isVNumeric = Utils.IsNumericType(typeof(TValue));
             int count = ReadInt32();
@@ -367,8 +381,24 @@ namespace EasyIO
             TValue value;
             for(int i = 0; i < count; i++)
             {
-                key = ReadStruct<TKey>(isKNumeric);
-                value = ReadStruct<TValue>(isVNumeric);
+                if (kIsString)
+                {
+                    key = (TKey)((object)ReadString());
+                }
+                else
+                {
+                    key = ReadStruct<TKey>(isKNumeric);
+                }
+                
+                if (vIsString)
+                {
+                    value = (TValue)((object)ReadString());
+                }
+                else
+                {
+                    value = ReadStruct<TValue>(isVNumeric);
+                }
+
                 dict.Add(key, value);
             }
             return dict;
@@ -396,8 +426,12 @@ namespace EasyIO
         /// </summary>
         /// <typeparam name="TStruct">The struct to read.</typeparam>
         /// <returns></returns>
-        public TStruct ReadStruct<TStruct>(bool convertEndian = true) where TStruct : struct
+        public TStruct ReadStruct<TStruct>(bool convertEndian = true)
         {
+            if (!typeof(TStruct).IsValueType)
+            {
+                throw new ArgumentException("TStruct must be a value type.");
+            }
             int size = Marshal.SizeOf(typeof(TStruct));
             byte[] data = convertEndian ? ReadAndFormat(size) : ReadBytes(size);
             IntPtr ptr = Marshal.AllocHGlobal(size);

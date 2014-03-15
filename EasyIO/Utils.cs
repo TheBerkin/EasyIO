@@ -63,8 +63,12 @@ namespace EasyIO
             }
         }
 
-        public static void ConvertStructEndians<TStruct>(ref TStruct o) where TStruct : struct
+        public static void ConvertStructEndians<TStruct>(ref TStruct o)
         {
+            if (!typeof(TStruct).IsValueType)
+            {
+                throw new ArgumentException("TStruct must be a value type.");
+            }
             object boxed = o;
             foreach (var field in typeof(TStruct).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
             {
