@@ -303,28 +303,76 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Writes a struct to the stream.
+        /// Writes a dictionary of string keys and the specified value type to the stream.
         /// </summary>
-        /// <typeparam name="TStruct">The type of the struct.</typeparam>
-        /// <param name="value">The struct to write.</param>
-        /// <param name="convertEndian"></param>
+        /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
+        /// <param name="value">The dictionary to write.</param>
+        public void Write<TValue>(Dictionary<string, TValue> value)
+            where TValue : struct
+        {
+            bool isVNumeric = Utils.IsNumericType(typeof(TValue));
+            Write(value.Count);
+
+            foreach(var pair in value)
+            {
+                Write(pair.Key);
+                Write<TValue>(pair.Value, isVNumeric);
+            }
+        }
+
+        /// <summary>
+        /// Writes a dictionary of strings with the specified key value type to the stream.
+        /// </summary>
+        /// <typeparam name="TKey">The key type of the dictionary.</typeparam>
+        /// <param name="value">The dictionary to write.</param>
+        public void Write<TKey>(Dictionary<TKey, string> value)
+            where TKey : struct
+        {
+            bool isKNumeric = Utils.IsNumericType(typeof(TKey));
+            Write(value.Count);
+
+            foreach(var pair in value)
+            {
+                Write<TKey>(pair.Key, isKNumeric);
+                Write(pair.Value);
+            }
+        }
+
+        /// <summary>
+        /// Writes a struct or enumeration member to the stream.
+        /// </summary>
+        /// <typeparam name="TStruct">The type of the struct or enum.</typeparam>
+        /// <param name="value">The object to write.</param>
+        /// <param name="convertEndian">Indicates to the writer if endianness attributes should be regarded.</param>
         public void Write<TStruct>(TStruct value, bool convertEndian = true) where TStruct : struct
         {
-            int length = Marshal.SizeOf(value);
-            byte[] data = new byte[length];
-            IntPtr ptr = Marshal.AllocHGlobal(length);
+            var type = typeof(TStruct);
+            int size = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(value);
+            byte[] data = new byte[size];
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            
+            if (type.IsEnum)
+            {
+                object i = value;
+                i = Convert.ChangeType(i, Enum.GetUnderlyingType(type));
+                Marshal.StructureToPtr(i, ptr, false); 
+            }
+            else if (convertEndian)
+            {
+                TStruct i = value;
+                Utils.ConvertStructEndians<TStruct>(ref i);
+                Marshal.StructureToPtr(i, ptr, false);     
+            }
+            
+            Marshal.Copy(ptr, data, 0, size);   
 
-            TStruct i = value;
             if (convertEndian)
             {
-                Utils.ConvertStructEndians<TStruct>(ref i);
+                Utils.ConvertEndian(data, _endian);
             }
 
-            Marshal.StructureToPtr(i, ptr, false);
-            Marshal.Copy(ptr, data, 0, length);
             Marshal.FreeHGlobal(ptr);
-
-            _stream.Write(data, 0, length);
+            _stream.Write(data, 0, size);
         }
 
         /// <summary>

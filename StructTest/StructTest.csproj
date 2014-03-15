@@ -32,8 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EasyIO">
-      <HintPath>..\EasyIO\bin\Release\EasyIO.dll</HintPath>
+    <Reference Include="EasyIO, Version=1.0.5187.28810, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\EasyIO\bin\Debug\EasyIO.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

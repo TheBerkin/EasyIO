@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyIO", "EasyIO\EasyIO.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructTest", "StructTest\StructTest.csproj", "{08797802-301A-450D-87CD-0C15F094DF9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitFieldTest", "BitFieldTest\BitFieldTest.csproj", "{0810829B-AA50-44E9-B553-3F66C79FB785}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{08797802-301A-450D-87CD-0C15F094DF9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08797802-301A-450D-87CD-0C15F094DF9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08797802-301A-450D-87CD-0C15F094DF9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0810829B-AA50-44E9-B553-3F66C79FB785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0810829B-AA50-44E9-B553-3F66C79FB785}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0810829B-AA50-44E9-B553-3F66C79FB785}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0810829B-AA50-44E9-B553-3F66C79FB785}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

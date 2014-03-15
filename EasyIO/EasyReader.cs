@@ -387,6 +387,7 @@ namespace EasyIO
             }
             byte size = (byte)Marshal.SizeOf(Enum.GetUnderlyingType(typeof(TEnum)));
             byte[] data = ReadAndFormat(size);
+            Array.Resize(ref data, 8);
             return (TEnum)Enum.ToObject(typeof(TEnum), BitConverter.ToInt64(data, 0));
         }
 

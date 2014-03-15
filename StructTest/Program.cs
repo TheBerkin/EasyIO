@@ -12,45 +12,51 @@ namespace StructTest
     {
         static void Main(string[] args)
         {
-            ExampleStruct e = new ExampleStruct(0xFF, 0xFF);
-
-            using(EasyWriter writer = new EasyWriter("example.dat"))
+            TestStruct test = new TestStruct()
             {
-                writer.Write<ExampleStruct>(e);
+                A = 1,
+                B = 2,
+                C = 3
+            };
+
+            Console.WriteLine("Writing data...");
+            using (EasyWriter writer = new EasyWriter("example.dat"))
+            {
+                writer.Write(TestEnum.Foo);
+                writer.Write(TestEnum.Bar);
+                writer.Write(test);
             }
 
-            Console.WriteLine("Written:");
-            Console.WriteLine("A={0}; B={1};", e.FieldA, e.FieldB);
-
-            using(EasyReader reader = new EasyReader("example.dat", FileMode.Open))
+            Console.WriteLine("Reading data...");
+            using (EasyReader reader = new EasyReader("example.dat"))
             {
-                e = reader.ReadStruct<ExampleStruct>();
+                Console.WriteLine("TestEnum.{0}", reader.ReadEnum<TestEnum>());
+                Console.WriteLine("TestEnum.{0}", reader.ReadEnum<TestEnum>());
+                Console.WriteLine(reader.ReadStruct<TestStruct>());
             }
-
-            Console.WriteLine("Read:");
-            Console.WriteLine("A={0}; B={1};", e.FieldA, e.FieldB);
 
             Console.ReadKey();
         }
-    }
 
-    struct ExampleStruct
-    {
-        [Endianness(Endian.Little)]
-        public int FieldA;
-
-        [Endianness(Endian.Big)]
-        public int FieldB;
-
-        public ExampleStruct(int a, int b)
+        struct TestStruct
         {
-            FieldA = a;
-            FieldB = b;
+            public int A;
+
+            [Endianness(Endian.Big)]
+            public long B;
+
+            public float C;
+
+            public override string ToString()
+            {
+                return String.Format("TestStruct: A={0}; B={1}; C={2};", A, B, C);
+            }
         }
 
-        public override string ToString()
+        enum TestEnum : int
         {
-            return String.Format("A={0}; B={1};", FieldA, FieldB);
+            Foo = 1,
+            Bar = 2
         }
     }
 }
