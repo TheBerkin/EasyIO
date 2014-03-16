@@ -363,7 +363,7 @@ namespace EasyIO
             
             Marshal.Copy(ptr, data, 0, size);   
 
-            if (convertEndian)
+            if (convertEndian && (Utils.IsNumericType(type) || type.IsEnum))
             {
                 Utils.ConvertEndian(data, _endian);
             }
