@@ -370,7 +370,7 @@ namespace EasyIO
             }
             else if (!vtype.IsValueType && !vIsString)
             {
-                throw new ArgumentException("TVaue must be either a value type or System.String.");
+                throw new ArgumentException("TValue must be either a value type or System.String.");
             }
 
             bool isKNumeric = Utils.IsNumericType(typeof(TKey));

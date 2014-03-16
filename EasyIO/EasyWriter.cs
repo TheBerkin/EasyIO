@@ -300,7 +300,7 @@ namespace EasyIO
             }
             else if (!vtype.IsValueType && !vIsString)
             {
-                throw new ArgumentException("TVaue must be either a value type or System.String.");
+                throw new ArgumentException("TValue must be either a value type or System.String.");
             }
 
             Write(value.Count);
@@ -350,8 +350,7 @@ namespace EasyIO
             
             if (type.IsEnum)
             {
-                object i = value;
-                i = Convert.ChangeType(i, Enum.GetUnderlyingType(type));
+                object i = Convert.ChangeType(value, Enum.GetUnderlyingType(type));
                 Marshal.StructureToPtr(i, ptr, false); 
             }
             else if (convertEndian)
