@@ -94,126 +94,138 @@ namespace EasyIO
         /// Writes a byte to the stream.
         /// </summary>
         /// <param name="value">The byte to write.</param>
-        public void Write(byte value)
+        public EasyWriter Write(byte value)
         {
             _stream.Write(new[] { value }, 0, 1);
+            return this;
         }
 
         /// <summary>
         /// Writes a signed byte to the stream.
         /// </summary>
         /// <param name="value">The signed byte to write.</param>
-        public void Write(sbyte value)
+        public EasyWriter Write(sbyte value)
         {
             _stream.Write(BitConverter.GetBytes(value), 0, 1);
+            return this;
         }
 
         /// <summary>
         /// Writes a 16-bit unsigned integer to the stream.
         /// </summary>
         /// <param name="value">The 16-bit unsigned integer to write.</param>
-        public void Write(ushort value)
+        public EasyWriter Write(ushort value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 2);
+            return this;
         }
 
         /// <summary>
         /// Writes a 16-bit signed integer to the stream.
         /// </summary>
         /// <param name="value">The 16-bit signed integer to write.</param>
-        public void Write(short value)
+        public EasyWriter Write(short value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 2);
+            return this;
         }
 
         /// <summary>
         /// Writes a 32-bit unsigned integer to the stream.
         /// </summary>
         /// <param name="value">The 32-bit unsigned integer to write.</param>
-        public void Write(uint value)
+        public EasyWriter Write(uint value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 4);
+            return this;
         }
 
         /// <summary>
         /// Writes a 32-bit signed integer to the stream.
         /// </summary>
         /// <param name="value">The 32-bit signed integer to write.</param>
-        public void Write(int value)
+        public EasyWriter Write(int value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 4);
+            return this;
         }
 
         /// <summary>
         /// Writes a 64-bit unsigned integer to the stream.
         /// </summary>
         /// <param name="value">The 64-bit unsigned integer to write.</param>
-        public void Write(ulong value)
+        public EasyWriter Write(ulong value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 8);
+            return this;
         }
 
         /// <summary>
         /// Writes a 64-bit signed integer to the stream.
         /// </summary>
         /// <param name="value">The 64-bit signed integer to write.</param>
-        public void Write(long value)
+        public EasyWriter Write(long value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 8);
+            return this;
         }
 
         /// <summary>
         /// Writes a single-precision floating-point number to the stream.
         /// </summary>
         /// <param name="value">The single-precision floating-point number to write.</param>
-        public void Write(float value)
+        public EasyWriter Write(float value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 4);
+            return this;
         }
 
         /// <summary>
         /// Writes a double-precision floating-point number to the stream.
         /// </summary>
         /// <param name="value">The double-precision floating-point number to write.</param>
-        public void Write(double value)
+        public EasyWriter Write(double value)
         {
             byte[] data = BitConverter.GetBytes(value);
             Utils.ConvertEndian(data, _endian);
             _stream.Write(data, 0, 8);
+            return this;
         }
 
         /// <summary>
         /// Writes a 128-bit decimal number to the stream.
         /// </summary>
         /// <param name="value">The 128-bit decimal number to write.</param>
-        public void Write(decimal value)
+        public EasyWriter Write(decimal value)
         {
             Write<decimal>(value);
+            return this;
         }
 
         /// <summary>
         /// Writes a Unicode string to the stream.
         /// </summary>
         /// <param name="value">The Unicode string to write.</param>
-        public void Write(string value)
+        public EasyWriter Write(string value)
         {
             int bytes = Encoding.Unicode.GetByteCount(value);
             Write(bytes);
             _stream.Write(Encoding.Unicode.GetBytes(value), 0, bytes);
+            return this;
         }
 
         /// <summary>
@@ -221,18 +233,19 @@ namespace EasyIO
         /// </summary>
         /// <param name="value">The string to write to the stream.</param>
         /// <param name="encoding">The encoding to write the string in.</param>
-        public void Write(string value, Encoding encoding)
+        public EasyWriter Write(string value, Encoding encoding)
         {
             int bytes = encoding.GetByteCount(value);
             Write(bytes);
             _stream.Write(encoding.GetBytes(value), 0, bytes);
+            return this;
         }
 
         /// <summary>
         /// Writes a Unicode string array to the stream.
         /// </summary>
         /// <param name="value">The Unicode string array to write.</param>
-        public void Write(string[] value)
+        public EasyWriter Write(string[] value)
         {
             int count = value.Length;
             Write(count);
@@ -240,6 +253,7 @@ namespace EasyIO
             {
                 Write(str);
             }
+            return this;
         }
 
         /// <summary>
@@ -247,7 +261,7 @@ namespace EasyIO
         /// </summary>
         /// <param name="value">The string array to write.</param>
         /// <param name="encoding">The encoding to write the strings in.</param>
-        public void Write(string[] value, Encoding encoding)
+        public EasyWriter Write(string[] value, Encoding encoding)
         {
             int count = value.Length;
             Write(count);
@@ -255,6 +269,7 @@ namespace EasyIO
             {
                 Write(str, encoding);
             }
+            return this;
         }
 
         /// <summary>
@@ -263,7 +278,7 @@ namespace EasyIO
         /// <typeparam name="T">The type of value stored in the array.</typeparam>
         /// <param name="array">The array to write.</param>
         /// <param name="use64bit">Indicates to the writer that the array length is 64-bit rather than 32-bit.</param>
-        public void Write<T>(T[] array, bool use64bit = false) where T : struct
+        public EasyWriter Write<T>(T[] array, bool use64bit = false) where T : struct
         {
             bool isNumeric = Utils.IsNumericType(typeof(T));
             if (use64bit)
@@ -279,6 +294,7 @@ namespace EasyIO
             {
                 Write<T>(item, isNumeric);
             }
+            return this;
         }
 
         /// <summary>
@@ -287,7 +303,7 @@ namespace EasyIO
         /// <typeparam name="TKey">The key type of the dictionary.</typeparam>
         /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
         /// <param name="value">The dictionary to write.</param>
-        public void Write<TKey, TValue>(Dictionary<TKey, TValue> value)
+        public EasyWriter Write<TKey, TValue>(Dictionary<TKey, TValue> value)
         {
             var ktype = typeof(TKey);
             bool kIsString = ktype == typeof(String);
@@ -328,6 +344,7 @@ namespace EasyIO
                     Write<TValue>(pair.Value, isVNumeric);
                 }                
             }
+            return this;
         }
 
         /// <summary>
@@ -336,7 +353,7 @@ namespace EasyIO
         /// <typeparam name="TStruct">The type of the struct or enum.</typeparam>
         /// <param name="value">The object to write.</param>
         /// <param name="convertEndian">Indicates to the writer if endianness attributes should be regarded.</param>
-        public void Write<TStruct>(TStruct value, bool convertEndian = true)
+        public EasyWriter Write<TStruct>(TStruct value, bool convertEndian = true)
         {
             if (!typeof(TStruct).IsValueType)
             {
@@ -369,6 +386,7 @@ namespace EasyIO
 
             Marshal.FreeHGlobal(ptr);
             _stream.Write(data, 0, size);
+            return this;
         }
 
         /// <summary>
@@ -376,7 +394,7 @@ namespace EasyIO
         /// </summary>
         /// <typeparam name="T">The type of the value to write.</typeparam>
         /// <param name="value">The nullable value to write.</param>
-        public void Write<T>(T? value)
+        public EasyWriter Write<T>(T? value)
             where T : struct
         {
             bool hasValue = value.HasValue;
@@ -385,6 +403,7 @@ namespace EasyIO
             {
                 Write(value.Value);
             }
+            return this;
         }
 
         /// <summary>
