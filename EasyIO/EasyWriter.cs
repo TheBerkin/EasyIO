@@ -373,6 +373,22 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Writes a nullable value to the stream.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to write.</typeparam>
+        /// <param name="value">The nullable value to write.</param>
+        public void Write<T>(T? value)
+            where T : struct
+        {
+            bool hasValue = value.HasValue;
+            Write(hasValue);
+            if (hasValue)
+            {
+                Write(value.Value);
+            }
+        }
+
+        /// <summary>
         /// Closes the writer and the underlying stream.
         /// </summary>
         public void Close()

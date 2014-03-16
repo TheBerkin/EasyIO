@@ -447,7 +447,22 @@ namespace EasyIO
             return i;
         }
 
-        
+        /// <summary>
+        /// Reads a nullable value.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to read.</typeparam>
+        /// <returns></returns>
+        public T? ReadNullable<T>()
+            where T : struct
+        {
+            T? value = null;
+            bool hasValue = ReadBoolean();
+            if (hasValue)
+            {
+                value = ReadStruct<T>();
+            }
+            return value;
+        }
 
         private byte[] ReadAndFormat(int count)
         {
