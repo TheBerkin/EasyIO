@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace EasyIO
 {
@@ -25,6 +26,27 @@ namespace EasyIO
             }
 
             _field = new byte[bits / 8];
+        }
+
+        internal BitField(byte[] data)
+        {
+            _field = data;
+        }
+
+        /// <summary>
+        /// Creates a BitField object from the specified data.
+        /// </summary>
+        /// <typeparam name="T">The type of data to pass.</typeparam>
+        /// <param name="value">The data to pass to the BitField.</param>
+        /// <returns></returns>
+        public static BitField FromValue<T>(T value) where T : struct
+        {
+            int size = Marshal.SizeOf(typeof(T));
+            byte[] data = new byte[size];
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(value, ptr, false);
+            Marshal.Copy(ptr, data, 0, size);
+            return new BitField(data);
         }
 
         /// <summary>

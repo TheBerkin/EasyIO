@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Berkin")]
 [assembly: AssemblyProduct("EasyIO")]
-[assembly: AssemblyCopyright("Copyright © Berkin 2014")]
+[assembly: AssemblyCopyright("Copyright © 2014 Nicholas Fleck")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

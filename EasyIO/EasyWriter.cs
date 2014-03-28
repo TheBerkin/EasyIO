@@ -21,11 +21,10 @@ namespace EasyIO
         /// Creates a new instance of the EasyIO.EasyWriter class from the specified stream.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
-        /// <param name="endianness">The endianness in which to write data.</param>
-        public EasyWriter(Stream stream, Endian endianness = Endian.Little)
+        public EasyWriter(Stream stream)
         {
             _stream = stream;
-            _endian = endianness;
+            _endian = Endian.Little;
             _leaveOpen = false;
         }
 
@@ -52,7 +51,7 @@ namespace EasyIO
         {
             _stream = File.Open(path, mode);
             _endian = endianness;
-            _leaveOpen = false;
+            _leaveOpen = false;            
         }
 
         /// <summary>
