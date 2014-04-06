@@ -12,7 +12,7 @@ namespace EasyIO
     /// </summary>
     public class BitField
     {
-        private byte[] _field;
+        internal byte[] _field;
 
         /// <summary>
         /// Creates a new instance of the EasyIO.BitField class with the specified number of bits.

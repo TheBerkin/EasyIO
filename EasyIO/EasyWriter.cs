@@ -100,11 +100,11 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Writes an array of bytes to the stream.
+        /// Writes an series of bytes to the stream.
         /// </summary>
         /// <param name="value">The byte array to write.</param>
         /// <returns></returns>
-        public EasyWriter Write(byte[] value)
+        public EasyWriter WriteBytes(byte[] value)
         {
             _stream.Write(value, 0, value.Length);
             return this;
@@ -400,6 +400,17 @@ namespace EasyIO
 
             Marshal.FreeHGlobal(ptr);
             _stream.Write(data, 0, size);
+            return this;
+        }
+
+        /// <summary>
+        /// Write a bit field to the stream.
+        /// </summary>
+        /// <param name="value">The bit field to write.</param>
+        /// <returns></returns>
+        public EasyWriter Write(BitField value)
+        {
+            _stream.Write(value._field, 0, value._field.Length);
             return this;
         }
 

@@ -797,6 +797,31 @@ namespace EasyIO
             return this;
         }
 
+        /// <summary>
+        /// Reads a bit field from the stream.
+        /// </summary>
+        /// <param name="sizeInBytes">The size of the bit field in bytes.</param>
+        /// <returns></returns>
+        public BitField ReadBitField(int sizeInBytes)
+        {
+            BitField bf = new BitField(new byte[sizeInBytes]);
+            _stream.Read(bf._field, 0, sizeInBytes);
+            return bf;
+        }
+
+        /// <summary>
+        /// Reads a bit field from the stream.
+        /// </summary>
+        /// <param name="sizeInBytes">The size of the bit field in bytes.</param>
+        /// <param name="value">The bit field that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadBitField(int sizeInBytes, out BitField value)
+        {
+            value = new BitField(new byte[sizeInBytes]);
+            _stream.Read(value._field, 0, sizeInBytes);
+            return this;
+        }
+
         private byte[] ReadAndFormat(int count)
         {
             byte[] buffer = new byte[count];
