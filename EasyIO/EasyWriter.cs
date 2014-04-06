@@ -100,6 +100,17 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Writes an array of bytes to the stream.
+        /// </summary>
+        /// <param name="value">The byte array to write.</param>
+        /// <returns></returns>
+        public EasyWriter Write(byte[] value)
+        {
+            _stream.Write(value, 0, value.Length);
+            return this;
+        }
+
+        /// <summary>
         /// Writes a signed byte to the stream.
         /// </summary>
         /// <param name="value">The signed byte to write.</param>
@@ -276,17 +287,21 @@ namespace EasyIO
         /// </summary>
         /// <typeparam name="T">The type of value stored in the array.</typeparam>
         /// <param name="array">The array to write.</param>
+        /// <param name="prefixLength">Indices to the writer if the array length should be prefixed to the data.</param>
         /// <param name="use64bit">Indicates to the writer that the array length is 64-bit rather than 32-bit.</param>
-        public EasyWriter Write<T>(T[] array, bool use64bit = false) where T : struct
+        public EasyWriter WriteArray<T>(T[] array, bool prefixLength = false, bool use64bit = false) where T : struct
         {
             bool isNumeric = Utils.IsNumericType(typeof(T));
-            if (use64bit)
+            if (prefixLength)
             {
-                Write(array.LongLength);
-            }
-            else
-            {
-                Write(array.Length);
+                if (use64bit)
+                {
+                    Write(array.LongLength);
+                }
+                else
+                {
+                    Write(array.Length);
+                }
             }
 
             foreach(T item in array)

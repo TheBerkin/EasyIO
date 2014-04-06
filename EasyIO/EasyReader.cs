@@ -139,6 +139,17 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a single byte.
+        /// </summary>
+        /// <param name="value">The byte that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadByte(out byte value)
+        {
+            value = (byte)_stream.ReadByte();
+            return this;
+        }
+
+        /// <summary>
         /// Reads an array of bytes.
         /// </summary>
         /// <param name="count">The number of bytes to read.</param>
@@ -148,6 +159,19 @@ namespace EasyIO
             byte[] buffer = new byte[count];
             _stream.Read(buffer, 0, count);
             return buffer;
+        }
+
+        /// <summary>
+        /// Reads an array of bytes.
+        /// </summary>
+        /// <param name="count">The number of bytes to read.</param>
+        /// <param name="value">The bytes that were read.</param>
+        /// <returns></returns>
+        public EasyReader ReadBytes(int count, out byte[] value)
+        {
+            value = new byte[count];
+            _stream.Read(value, 0, count);
+            return this;
         }
 
         /// <summary>
@@ -162,12 +186,46 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads all bytes from the stream.
+        /// </summary>
+        /// <param name="value">The bytes from the stream.</param>
+        public void ReadAllBytes(out byte[] value)
+        {
+            value = new byte[_stream.Length];
+            _stream.Read(value, 0, value.Length);            
+        }
+
+        /// <summary>
         /// Reads a signed byte.
         /// </summary>
         /// <returns></returns>
         public sbyte ReadSByte()
         {
-            return (sbyte)_stream.ReadByte();
+            IntermediateByte ib = new IntermediateByte();
+            ib.U = (byte)_stream.ReadByte();
+            return ib.S;            
+        }
+
+        /// <summary>
+        /// Reads a signed byte.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadSByte(out sbyte value)
+        {
+            IntermediateByte ib = new IntermediateByte();
+            ib.U = (byte)_stream.ReadByte();
+            value = ib.S;
+            return this;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct IntermediateByte
+        {
+            [FieldOffset(0)]
+            public byte U;
+            [FieldOffset(0)]
+            public sbyte S;
         }
 
         /// <summary>
@@ -177,6 +235,18 @@ namespace EasyIO
         public char ReadChar()
         {
             return BitConverter.ToChar(ReadAndFormat(2), 0);
+        }
+
+
+        /// <summary>
+        /// Reads a Unicode character.
+        /// </summary>
+        /// <param name="value">The character that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadChar(out char value)
+        {
+            value = BitConverter.ToChar(ReadAndFormat(2), 0);
+            return this;
         }
 
         /// <summary>
@@ -189,13 +259,14 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Reads a series of Unicode characters.
+        /// Reads a 1-byte boolean value.
         /// </summary>
-        /// <param name="count">The number of characters to read.</param>
+        /// <param name="value">The boolean value that was read.</param>
         /// <returns></returns>
-        public char[] ReadChars(int count)
+        public EasyReader ReadBoolean(out bool value)
         {
-            return Encoding.Unicode.GetChars(ReadBytes(count));
+            value = ReadByte() != 0;
+            return this;
         }
 
         /// <summary>
@@ -205,6 +276,17 @@ namespace EasyIO
         public ushort ReadUInt16()
         {
             return BitConverter.ToUInt16(ReadAndFormat(2), 0);
+        }
+
+        /// <summary>
+        /// Reads a 16-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadUInt16(out ushort value)
+        {
+            value = BitConverter.ToUInt16(ReadAndFormat(2), 0);
+            return this;
         }
 
         /// <summary>
@@ -226,12 +308,34 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a 32-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadUInt32(out uint value)
+        {
+            value = BitConverter.ToUInt32(ReadAndFormat(4), 0);
+            return this;
+        }
+
+        /// <summary>
         /// Reads a 32-bit signed integer.
         /// </summary>
         /// <returns></returns>
         public int ReadInt32()
         {
             return BitConverter.ToInt32(ReadAndFormat(4), 0);
+        }
+
+        /// <summary>
+        /// Reads a 32-bit signed integer.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadInt32(out int value)
+        {
+            value = BitConverter.ToInt32(ReadAndFormat(4), 0);
+            return this;
         }
 
         /// <summary>
@@ -244,12 +348,34 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a 64-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadUInt64(out ulong value)
+        {
+            value = BitConverter.ToUInt64(ReadAndFormat(8), 0); ;
+            return this;
+        }
+
+        /// <summary>
         /// Reads a 64-bit signed integer.
         /// </summary>
         /// <returns></returns>
         public long ReadInt64()
         {
             return BitConverter.ToInt64(ReadAndFormat(8), 0);
+        }
+
+        /// <summary>
+        /// Reads a 64-bit signed integer.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadInt64(out long value)
+        {
+            value = BitConverter.ToInt64(ReadAndFormat(8), 0);
+            return this;
         }
 
         /// <summary>
@@ -262,6 +388,17 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a single-precision floating point number.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadSingle(out float value)
+        {
+            value = BitConverter.ToSingle(ReadAndFormat(4), 0); ;
+            return this;
+        }
+
+        /// <summary>
         /// Reads a double-precision floating-point number.
         /// </summary>
         /// <returns></returns>
@@ -271,12 +408,34 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a double-precision floating-point number.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadDouble(out double value)
+        {
+            value = BitConverter.ToDouble(ReadAndFormat(8), 0);
+            return this;
+        }
+
+        /// <summary>
         /// Reads a 128-bit decimal number.
         /// </summary>
         /// <returns></returns>
         public decimal ReadDecimal()
         {
             return ReadStruct<decimal>();
+        }
+
+        /// <summary>
+        /// Reads a 128-bit decimal number.
+        /// </summary>
+        /// <param name="value">The value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadDecimal(out decimal value)
+        {
+            value = ReadStruct<decimal>();
+            return this;
         }
 
         /// <summary>
@@ -290,6 +449,18 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a Unicode string.
+        /// </summary>
+        /// <param name="value">The string that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadString(out string value)
+        {
+            int bytes = ReadInt32();
+            value = Encoding.Unicode.GetString(ReadBytes(bytes));
+            return this;
+        }
+
+        /// <summary>
         /// Reads a string encoded in the specified encoding.
         /// </summary>
         /// <param name="encoding">The encoding of the string to be read.</param>
@@ -298,6 +469,19 @@ namespace EasyIO
         {
             int bytes = ReadInt32();
             return encoding.GetString(ReadBytes(bytes));
+        }
+
+        /// <summary>
+        /// Reads a string encoded in the specified encoding.
+        /// </summary>
+        /// <param name="encoding">The encoding of the string to be read.</param>
+        /// <param name="value">The string that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadString(Encoding encoding, out string value)
+        {
+            int bytes = ReadInt32();
+            value = encoding.GetString(ReadBytes(bytes));
+            return this;
         }
 
         /// <summary>
@@ -313,6 +497,23 @@ namespace EasyIO
                 array[i] = ReadString();
             }
             return array;
+        }
+
+        /// <summary>
+        /// Reads an array of Unicode strings.
+        /// </summary>
+        /// <param name="value">The array of strings that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadStringArray(out string[] value)
+        {
+            int length = ReadInt32();
+            string[] array = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadString();
+            }
+            value = array;
+            return this;
         }
 
         /// <summary>
@@ -332,7 +533,25 @@ namespace EasyIO
         }
 
         /// <summary>
-        /// Reads an array of the specified type.
+        /// Reads a string array encoded in the specified encoding.
+        /// </summary>
+        /// <param name="encoding">The encoding of the strings to be read.</param>
+        /// <param name="value">The array of strings that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadStringArray(Encoding encoding, out string[] value)
+        {
+            int length = ReadInt32();
+            string[] array = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadString(encoding);
+            }
+            value = array;
+            return this;
+        }
+
+        /// <summary>
+        /// Reads an array of the specified value type.
         /// </summary>
         /// <typeparam name="T">The type stored in the array.</typeparam>
         /// <param name="use64bit">Indicates to the reader that the array length is 64-bit rather than 32-bit.</param>
@@ -347,6 +566,62 @@ namespace EasyIO
                 array[i] = ReadStruct<T>(isNumeric);
             }
             return array;
+        }
+
+        /// <summary>
+        /// Reads an array of the specified value type.
+        /// </summary>
+        /// <typeparam name="T">The type stored in the array.</typeparam>
+        /// <param name="value">The array that was read.</param>
+        /// <param name="use64bit">Indicates to the reader that the array length is 64-bit rather than 32-bit.</param>
+        /// <returns></returns>
+        public EasyReader ReadArray<T>(out T[] value, bool use64bit = false) where T : struct
+        {
+            bool isNumeric = Utils.IsNumericType(typeof(T));
+            long count = use64bit ? ReadInt64() : ReadInt32();
+            T[] array = new T[count];
+            for (int i = 0; i < count; i++)
+            {
+                array[i] = ReadStruct<T>(isNumeric);
+            }
+            value = array;
+            return this;
+        }
+
+        /// <summary>
+        /// Reads an array of the specified type and item count.
+        /// </summary>
+        /// <typeparam name="T">The type stored in the array.</typeparam>
+        /// <param name="length">The length of the array.</param>
+        /// <returns></returns>
+        public T[] ReadArray<T>(int length) where T : struct
+        {
+            bool isNumeric = Utils.IsNumericType(typeof(T));
+            T[] array = new T[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadStruct<T>(isNumeric);
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Reads an array of the specified type and item count.
+        /// </summary>
+        /// <typeparam name="T">The type stored in the array.</typeparam>
+        /// <param name="length">The length of the array.</param>
+        /// <param name="value">The array that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadArray<T>(int length, out T[] value) where T : struct
+        {
+            bool isNumeric = Utils.IsNumericType(typeof(T));
+            T[] array = new T[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadStruct<T>(isNumeric);
+            }
+            value = array;
+            return this;
         }
 
         /// <summary>
@@ -405,6 +680,21 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a dictionary of the specified key and value types.
+        /// </summary>
+        /// <typeparam name="TKey">The key type of the dictionary.</typeparam>
+        /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
+        /// <param name="value">The dictionary that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadDictionary<TKey, TValue>(out Dictionary<TKey, TValue> value) 
+            where TKey : IConvertible
+            where TValue : IConvertible
+        {
+            value = ReadDictionary<TKey, TValue>();
+            return this;
+        }
+
+        /// <summary>
         /// Reads an enumeration member.
         /// </summary>
         /// <typeparam name="TEnum">The enumeration type to read.</typeparam>
@@ -422,9 +712,22 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads an enumeration member.
+        /// </summary>
+        /// <typeparam name="TEnum">The enumeration type to read.</typeparam>
+        /// <param name="value">The enumeration member that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadEnum<TEnum>(out TEnum value) where TEnum : struct, IConvertible
+        {
+            value = ReadEnum<TEnum>();
+            return this;
+        }
+
+        /// <summary>
         /// Reads a struct of the specified type.
         /// </summary>
         /// <typeparam name="TStruct">The struct to read.</typeparam>
+        /// <param name="convertEndian"></param>
         /// <returns></returns>
         public TStruct ReadStruct<TStruct>(bool convertEndian = true)
         {
@@ -448,6 +751,19 @@ namespace EasyIO
         }
 
         /// <summary>
+        /// Reads a struct of the specified type.
+        /// </summary>
+        /// <typeparam name="TStruct">The struct to read.</typeparam>
+        /// <param name="convertEndian">Specifies if struct members marked with the [Endianness(Endian)] attribute should have their endianness converted as necessary.</param>
+        /// <param name="value">The struct that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadStruct<TStruct>(out TStruct value, bool convertEndian = true)
+        {
+            value = ReadStruct<TStruct>(convertEndian);
+            return this;
+        }
+
+        /// <summary>
         /// Reads a nullable value.
         /// </summary>
         /// <typeparam name="T">The type of the value to read.</typeparam>
@@ -462,6 +778,23 @@ namespace EasyIO
                 value = ReadStruct<T>();
             }
             return value;
+        }
+
+        /// <summary>
+        /// Reads a nullable value.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to read.</typeparam>
+        /// <param name="value">The nullable value that was read.</param>
+        /// <returns></returns>
+        public EasyReader ReadNullable<T>(out T? value) where T : struct
+        {
+            value = null;
+            bool hasValue = ReadBoolean();
+            if (hasValue)
+            {
+                value = ReadStruct<T>();
+            }
+            return this;
         }
 
         private byte[] ReadAndFormat(int count)
