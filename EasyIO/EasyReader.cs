@@ -736,7 +736,8 @@ namespace EasyIO
                 throw new ArgumentException("TStruct must be a value type.");
             }
             int size = Marshal.SizeOf(typeof(TStruct));
-            byte[] data = convertEndian ? ReadAndFormat(size) : ReadBytes(size);
+            bool numeric = Utils.IsNumericType(typeof(TStruct));
+            byte[] data = numeric ? ReadAndFormat(size) : ReadBytes(size);
             IntPtr ptr = Marshal.AllocHGlobal(size);
             Marshal.Copy(data, 0, ptr, size);
             TStruct i = (TStruct)Marshal.PtrToStructure(ptr, typeof(TStruct));
